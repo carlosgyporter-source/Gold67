@@ -29,10 +29,11 @@ const PIN_KEY = "6ixseven-gold-pin-v2";
 const APP_NAME = "6ixSeven Gold";
 const REFRESH_MS = 10 * 60 * 1000;
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const DEFAULT_SERVER = "PU Prime 6_MT5";
 
 function money(value: number | string | null | undefined) {
   const n = Number(value || 0);
-  return `${n < 0 ? "-" : ""}$${Math.abs(n).toLocaleString(undefined, {
+  return `${n < 0 ? "-" : ""}£${Math.abs(n).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -53,7 +54,7 @@ function makeBlankAccount(index: number): ManagedAccount {
     name: `Account ${index}`,
     mt5Username: "",
     mt5Password: "",
-    server: "",
+    server: DEFAULT_SERVER,
     netDeposits: 0,
     netProfit: 0,
     funds: 0,
@@ -167,7 +168,6 @@ export default function Home() {
 
     try {
       if (!API_BASE_URL) {
-        // Frontend-only mode: keep the UI ready, but no live fetch without a backend.
         updateAccount(account.id, {
           syncState: "idle",
           lastSyncedAt: new Date().toISOString(),
@@ -322,7 +322,7 @@ export default function Home() {
             <div style={styles.sectionHeader}>
               <div>
                 <h2 style={styles.sectionTitle}>Portal</h2>
-                <p style={styles.subtle}>Add MT5 username, password, and server for each account</p>
+                <p style={styles.subtle}>Enter the PAMM Account login details to pull data</p>
               </div>
               <button style={styles.primaryBtn} onClick={addAccount}>
                 + Add Account
@@ -330,11 +330,11 @@ export default function Home() {
             </div>
 
             <div style={styles.portalNote}>
-              Account 1, Account 2, and Account 3 are already available. Add more rows as needed, then sync each one.
+              Account 1, Account 2, and Account 3 are already available. The server defaults to <strong>{DEFAULT_SERVER}</strong>. For live portal syncing, the backend should use the portal credentials you enter here.
             </div>
 
             <div style={{ display: "grid", gap: 14, marginTop: 16 }}>
-              {accounts.map((account, index) => (
+              {accounts.map((account) => (
                 <div key={account.id} style={styles.accountCard}>
                   <div style={styles.accountHeader}>
                     <div>
@@ -356,23 +356,23 @@ export default function Home() {
                       placeholder="Account name"
                     />
                     <Field
-                      label="MT5 Username"
+                      label="PAMM Account"
                       value={account.mt5Username}
                       onChange={(value) => updateAccount(account.id, { mt5Username: value })}
-                      placeholder="MT5 username"
+                      placeholder="PAMM Account"
                     />
                     <Field
-                      label="MT5 Password"
+                      label="Password"
                       type="password"
                       value={account.mt5Password}
                       onChange={(value) => updateAccount(account.id, { mt5Password: value })}
-                      placeholder="MT5 password"
+                      placeholder="Password"
                     />
                     <Field
                       label="Server"
                       value={account.server}
-                      onChange={(value) => updateAccount(account.id, { server: value })}
-                      placeholder="Server"
+                      onChange={(value) => updateAccount(account.id, { server: value || DEFAULT_SERVER })}
+                      placeholder={DEFAULT_SERVER}
                     />
                   </div>
 
